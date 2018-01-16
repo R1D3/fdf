@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+
 #ifndef _FDF_H_
 # define _FDF_H_
 # define WIDTH		800
@@ -31,8 +32,16 @@ typedef struct  s_env
 	int dx;
 	int dy;
 	int fd;
-	t_coord	 **coord;
+    int ret;
+    char *line;
+    char *file;
 
 }				t_env;
+
+typedef struct      s_element
+{
+    void            *content;
+    struct s_element  *next;
+}                   t_element;
 
 #endif

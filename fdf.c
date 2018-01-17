@@ -9,15 +9,15 @@
 /*   Updated: 2018/01/10 18:04:30 by emassou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "fdf.h"
-int alloctab2(t_env *a, char **line)
+
+int alloctab2(t_env *a, char *line)
 {
     char  **tab;
     int i;
 
     i = 0;
-    tab = ft_strsplit(*line, ' ');
+    tab = ft_strsplit(line, ' ');
     while (tab[i])
     {
         free(tab[i]);
@@ -39,13 +39,12 @@ int alloctab2(t_env *a, char **line)
 int alloctab(t_env *a)
 {
     char    *line;
-    int     tab[3];
 
     a->lines = 0;
     a->chars = 0;
     while (get_next_line(a->fd, &line) == 1)
     {
-        if (alloctab2(a, &line) == -1)
+        if (alloctab2(a, line) == -1)
             return (-1);
     }
     a->map = ft_memalloc(sizeof(int*) * a->lines);
@@ -60,21 +59,25 @@ int ft_reader(t_env *a)
     char    *tab;
     int     tabxy[3];
 
+    tabxy[1] = 0;
     if (alloctab(a) == -1)
         return (-1);
-    tabxy[1] = 0;
-    while (get_next_line(a->fd, &line) == 1)
+    while ((tabxy[2] = get_next_line(a->fd, &line) == 1))
         {
             tabxy[0] = 0;
             a->map = ft_memalloc(sizeof(int*) * a->chars);
             tab = ft_strsplit(line, ' ');
             while (tabxy[0] != NULL)
             {
-                a->map[tabxy[1]][tabxy[0]] = ft_atoi(tab);
+                a->map[tabxy[1]][tabxy[0]] = ft_atoi(tab[tabxy[0]]);
+                free(tab[tabxy[0]]);
+                tabxy[0]++;
             }
+        free(tab);
+        tabxy[1]++;
         }
 
-    return (1);
+    return ((tabxy[2] == -1) ? -1 : 0);
 }
 
 int main(int ac, char **av)
@@ -87,6 +90,7 @@ int main(int ac, char **av)
 		if (ft_reader(&main) == -1)
             return (-1);
 	}
-	ft_putendl("usage : ./fdf file ");
+    else
+	    ft_putendl("usage : ./fdf file ");
 	return (0);
 }

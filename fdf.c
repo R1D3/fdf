@@ -10,14 +10,83 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "fdf.h"
-
-void mlx(t_env *m)
+#include "fdf.h"
+int alloctab2(t_env *a, char **line)
 {
+    char  **tab;
+    int i;
 
-	m->mlx = mlx_init();
-	m->win = mlx_new_window(m->mlx, WIDTH, HEIGHT, "fdf 42");
-	m->img = mlx_new_image(m->mlx, WIDTH, HEIGHT);
-	mlx_key_hook(m->win, key_funct, m);
-	mlx_loop(m->mlx);
+    i = 0;
+    tab = ft_strsplit(*line, ' ');
+    while (tab[i])
+    {
+        free(tab[i]);
+        i++;
+    }
+    if (a->lines == 0)
+        a->chars = i;
+    else
+    {
+       if (i != a->chars)
+        return (-1);
+    }
+    a->lines++;
+    free(tab);
+    free(line);
+    return (0);
+}
+
+int alloctab(t_env *a)
+{
+    char    *line;
+    int     tab[3];
+
+    a->lines = 0;
+    a->chars = 0;
+    while (get_next_line(a->fd, &line) == 1)
+    {
+        if (alloctab2(a, &line) == -1)
+            return (-1);
+    }
+    a->map = ft_memalloc(sizeof(int*) * a->lines);
+    close(a->fd);
+    a->fd = open(a->file, O_RDONLY);
+    return (1);
+}
+
+int ft_reader(t_env *a)
+{
+    char    *line;
+    char    *tab;
+    int     tabxy[3];
+
+    if (alloctab(a) == -1)
+        return (-1);
+    tabxy[1] = 0;
+    while (get_next_line(a->fd, &line) == 1)
+        {
+            tabxy[0] = 0;
+            a->map = ft_memalloc(sizeof(int*) * a->chars);
+            tab = ft_strsplit(line, ' ');
+            while (tabxy[0] != NULL)
+            {
+                a->map[tabxy[1]][tabxy[0]] = ft_atoi(tab);
+            }
+        }
+
+    return (1);
+}
+
+int main(int ac, char **av)
+{
+	t_env main;
+	if (ac == 2)
+	{
+        main.file = av[1];
+        main.fd = open(main.file, O_RDONLY);
+		if (ft_reader(&main) == -1)
+            return (-1);
+	}
+	ft_putendl("usage : ./fdf file ");
+	return (0);
 }

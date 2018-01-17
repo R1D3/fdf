@@ -10,38 +10,40 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #ifndef _FDF_H_
 # define _FDF_H_
 # define WIDTH		800
 # define HEIGHT		600
-# include "mlx.h"
 # include "libft/libft.h"
+# include <math.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <unistd.h>
+# include <fcntl.h>
 
-typedef struct  s_env
+typedef struct		s_env
 {
-	void *mlx;
-	void *win;
-	void *img;
-	int	*imgstr;
-	int z;
-	int y;
-	int x;
-	int dx;
-	int dy;
-	int fd;
-    int ret;
-    char *line;
-    char *file;
+	void			*mlx;
+	void			*win;
+	void			*img;
+	int				*imgstr;
+	char			*file;
+	int				**map;
+	int				fd;
+	int				lines;
+	int				chars;
+	int				z;
+	int				y;
+	int				x;
+	int				dx;
+	int				dy;
+}					t_env;
 
-}				t_env;
-
-typedef struct      s_element
+typedef struct			s_element
 {
-    void            *content;
-    struct s_element  *next;
-}                   t_element;
+	void				*content;
+	struct s_element	*next;
+}						t_element;
 
+int ft_reader(t_env *r);
 #endif

@@ -15,6 +15,7 @@
 # define WIDTH		800
 # define HEIGHT		600
 # include "libft/libft.h"
+# include "mlx.h"
 # include <math.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -39,11 +40,4 @@ typedef struct		s_env
 	int				dy;
 }					t_env;
 
-typedef struct			s_element
-{
-	void				*content;
-	struct s_element	*next;
-}						t_element;
-
-int ft_reader(t_env *r);
 #endif

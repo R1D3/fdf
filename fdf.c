@@ -10,46 +10,35 @@
 /*                                                                            */
 /* ************************************************************************** */
 # include "fdf.h"
+
 int key_funct(int keycode, t_env *a)
 {
-    printf("coucou");
+    printf("%d\n", keycode );
     if (keycode == 53)
         exit(1);
     return (0);
 }
+
 void draw(t_env *a)
 {
-    int count_h;
-    int count_w;
+    int y;
+    int x;
+    int tabxy[2];
 
-    count_h = -1;
-    while (count_h++ < HEIGHT)
+    tabxy[0] = -1;
+    y = HEIGHT / 3;
+    while (y++ < HEIGHT && tabxy[0]++ < a->lines)
         {
-            count_w = -1;
-            while (count_w++ < WIDTH)
+            tabxy[1] = -1;
+            x = WIDTH / 4;
+            while (x++ < WIDTH && tabxy[1]++ < a->chars)
                 {
-                    if (count_w % 2)
-                        a->imgstr[count_h * WIDTH + count_w] = 0xFF0000;
-                    else
-                        a->imgstr[count_h * WIDTH + count_w] = 0x00FF00;
+                    a->imgstr[y * WIDTH + x] = 0x00FFFFFF;
+                    x += 20;
                 }
+        y += 20;
         }
     mlx_put_image_to_window(a->mlx, a->win, a->img, 0, 0);
-}
-
-void mlx(t_env *a)
-{
-    int bpp;
-    int sl;
-    int endian;
-
-    a->mlx = mlx_init();
-    a->win = mlx_new_window(a->mlx, WIDTH, HEIGHT, "fdf42");
-    a->img = mlx_new_image(a->mlx, WIDTH, HEIGHT);
-    a->imgstr = (int*)mlx_get_data_addr(a->img, &bpp, &sl, &endian);
-    draw(a);
-    mlx_key_hook(a->win, key_funct, a);
-    mlx_loop(a->mlx);
 }
 
 int alloctab2(t_env *a, char *line)
@@ -93,7 +82,7 @@ int alloctab(t_env *a)
     a->map = ft_memalloc(sizeof(int*) * a->lines);
     close(a->fd);
     a->fd = open(a->file, O_RDONLY);
-    return (1);
+    return (0);
 }
 
 int ft_reader(t_env *a)
@@ -120,6 +109,21 @@ int ft_reader(t_env *a)
         tabxy[1]++;
         }
     return ((tabxy[2] == -1) ? -1 : 0);
+}
+
+void mlx(t_env *a)
+{
+    int bpp;
+    int sl;
+    int endian;
+
+    a->mlx = mlx_init();
+    a->win = mlx_new_window(a->mlx, WIDTH, HEIGHT, "fdf42");
+    a->img = mlx_new_image(a->mlx, WIDTH, HEIGHT);
+    a->imgstr = (int*)mlx_get_data_addr(a->img, &bpp, &sl, &endian);
+    draw(a);
+    mlx_key_hook(a->win, key_funct, a);
+    mlx_loop(a->mlx);
 }
 
 int main(int ac, char **av)

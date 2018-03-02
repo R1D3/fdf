@@ -29,15 +29,26 @@ typedef struct		s_env
 	void			*img;
 	int				*imgstr;
 	char			*file;
-	int				**map;
 	int				fd;
 	int				lines;
 	int				chars;
-	int				z;
-	int				y;
+	int				i;
+	int				j;
+	int				k;
 	int				x;
+	int				y;
+	int				x1;
+	int				y1;
+	int				x2;
+	int				y2;
 	int				dx;
 	int				dy;
+	int				xinc;
+	int				yinc;
+	int				cumul;
+	int				check;
+	int				color;
+	int				**map;
 }					t_env;
 
 #endif

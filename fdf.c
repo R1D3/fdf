@@ -9,6 +9,7 @@
 /*   Updated: 2018/01/10 18:04:30 by emassou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 # include "fdf.h"
 
 int key_funct(int keycode, t_env *a)
@@ -16,29 +17,176 @@ int key_funct(int keycode, t_env *a)
     printf("%d\n", keycode );
     if (keycode == 53)
         exit(1);
+
     return (0);
 }
 
-void draw(t_env *a)
+void iso(t_env *a)
 {
-    int y;
-    int x;
-    int tabxy[2];
+    a->x = a->x1 - a->y1;
+    a->y = (a->y1 + a->x1) / 2;
+}
 
-    tabxy[0] = -1;
-    y = HEIGHT / 3;
-    while (y++ < HEIGHT && tabxy[0]++ < a->lines)
+void segment(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
+{
+    a->x1 = coord[tabxy[0]][tabxy[1]][0];
+    a->x2 = coord[tabxy[0]][tabxy[1] + 1][0];
+    a->y1 = coord[tabxy[0]][tabxy[1]][1];
+    a->y2 = coord[tabxy[0] + 1][tabxy[1]][1];
+    a->x = a->x1;
+    a->y = a->y1;
+    a->dx = abs(a->x2 - a->x1);
+    a->dy = abs(a->y2 - a->y1);
+    a->xinc = ( a->dx > 0 ) ? 1 : -1;
+    a->yinc = ( a->dy > 0 ) ? 1 : -1;
+    if (a->dx > a->dy)
+    {
+        a->cumul = a->dx / 2 ;
+        a->i = 1;
+        while (a->i++ <= a->dx && tabxy[1] < a->chars - 1)
         {
-            tabxy[1] = -1;
-            x = WIDTH / 4;
-            while (x++ < WIDTH && tabxy[1]++ < a->chars)
-                {
-                    a->imgstr[y * WIDTH + x] = 0x00FFFFFF;
-                    x += 20;
-                }
-        y += 20;
+            a->x += a->xinc;
+            a->cumul += a->dy;
+            if (a->cumul >= a->dx)
+            {
+                a->cumul -= a->dx;
+                a->y += a->yinc;
+            }
+            a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
+            if (a->map[tabxy[0]][tabxy[1]] != 0)
+                if( a->map[tabxy[0]][tabxy[1]] > 0)
+                    a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
         }
-    mlx_put_image_to_window(a->mlx, a->win, a->img, 0, 0);
+    }
+    else 
+    {
+        a->cumul = a->dy / 2 ;
+        a->i = 1;
+        while (a->i++ <= a->dy && tabxy[0] < a->lines - 1)
+        {
+            a->y += a->yinc ;
+            a->cumul += a->dx ;
+            if ( a->cumul >= a->dy ) 
+            {
+                a->cumul -= a->dy ;
+                a->x += a->xinc ;
+            }
+            a->imgstr[a->y * WIDTH + a->x] = 0x00FFFFFF;
+            if (a->map[tabxy[0]][tabxy[1]] != 0)
+                a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
+        }
+    }
+}
+
+void horizontal(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
+{
+    a->x1 = coord[tabxy[0]][tabxy[1]][0];
+    a->x2 = coord[tabxy[0]][tabxy[1] + 1][0];
+    a->y1 = coord[tabxy[0]][tabxy[1]][1];
+    a->y2 = coord[tabxy[0]][tabxy[1] + 1][1];
+   a->x = a->x1;
+    a->y = a->y1;
+    a->dx = abs(a->x2 - a->x1);
+    a->dy = abs(a->y2 - a->y1);
+    a->xinc = ( a->dx > 0 ) ? 1 : -1;
+    a->yinc = ( a->dy > 0 ) ? 1 : -1;
+    if (a->dx > a->dy)
+    {
+        a->cumul = a->dx / 2 ;
+        a->i = 1;
+        while (a->i++ <= a->dx && tabxy[1] < a->chars - 1)
+        {
+            a->x += a->xinc;
+            a->cumul += a->dy;
+            if (a->cumul >= a->dx)
+            {
+                a->cumul -= a->dx;
+                a->y += a->yinc;
+            }
+            a->imgstr[a->y * WIDTH + a->x] = 0x00FFFFFF;
+            if (a->map[tabxy[0]][tabxy[1]] != 0)
+            {
+                a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
+            }
+        }
+    }
+}
+
+void vertical(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
+{
+    a->x1 = coord[tabxy[0]][tabxy[1]][0];
+    a->x2 = coord[tabxy[0]][tabxy[1]][0];
+    a->y1 = coord[tabxy[0]][tabxy[1]][1];
+    a->y2 = coord[tabxy[0] + 1][tabxy[1]][1];
+    a->x = a->x1;
+    a->y = a->y1;
+    a->dx = abs(a->x2 - a->x1);
+    a->dy = abs(a->y2 - a->y1);
+    a->xinc = ( a->dx > 0 ) ? 1 : -1;
+    a->yinc = ( a->dy > 0 ) ? 1 : -1;
+    if (a->map[tabxy[0]][tabxy[1]] != 0)
+                a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
+    if (!(a->dx > a->dy))
+    {
+        a->cumul = a->dy / 2 ;
+        a->i = 1;
+        while (a->i++ <= a->dy && tabxy[0] < a->lines - 1)
+        {
+            a->y += a->yinc ;
+            a->cumul += a->dx ;
+            if ( a->cumul >= a->dy ) 
+            {
+                a->cumul -= a->dy ;
+                a->x += a->xinc ;
+            }
+            a->imgstr[a->y * WIDTH + a->x] = 0x00FFFFFF;
+            if (a->map[tabxy[0]][tabxy[1]] != 0)
+                a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
+        }
+    }
+}
+
+void draw(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
+{   
+    tabxy[0] = 0;
+    while (a->y1 < HEIGHT && tabxy[0] < a->lines)
+        {
+            tabxy[1] = 0;
+            while (a->x1 < WIDTH && tabxy[1] < a->chars)
+                {
+                    horizontal(a, coord, tabxy);
+                    vertical(a, coord, tabxy);
+                    segment(a, coord, tabxy);
+                    tabxy[1]++;
+                }
+            tabxy[0]++;
+        }
+    mlx_put_image_to_window(a->mlx, a->win, a->img, 150, 150);
+}
+
+void drawcoord(t_env *a)
+{
+    int tabxy[2];
+    int coord[a->lines + 1][a->chars + 1][2];
+
+    tabxy[0] = 0;
+    a->y1 = 0;
+    while (a->y1 < HEIGHT && tabxy[0] < a->lines)
+        {
+
+            a->x1 = 0; 
+            tabxy[1] = 0;
+            while (a->x1 < WIDTH && tabxy[1] < a->chars)
+                {
+                    coord[tabxy[0]][tabxy[1]][0] = a->x1;
+                    coord[tabxy[0]][tabxy[1]][1] = a->y1;
+                    a->x1 += 30;
+                    tabxy[1]++;
+                }
+            a->y1 += 30;
+            tabxy[0]++;
+        }
+    draw(a, coord, tabxy);
 }
 
 int alloctab2(t_env *a, char *line)
@@ -79,7 +227,7 @@ int alloctab(t_env *a)
         if (alloctab2(a, line) == -1)
             return (-1);
     }
-    a->map = ft_memalloc(sizeof(int*) * a->lines);
+    a->map = malloc(sizeof(int*) * a->lines);
     close(a->fd);
     a->fd = open(a->file, O_RDONLY);
     return (0);
@@ -97,7 +245,7 @@ int ft_reader(t_env *a)
     while ((tabxy[2] = get_next_line(a->fd, &line) > 0))
         {
             tabxy[0] = 0;
-            a->map[tabxy[1]] = ft_memalloc(sizeof(int) * a->chars);
+            a->map[tabxy[1]] = malloc(sizeof(int) * a->chars);
             tab = ft_strsplit(line, ' ');
             while (tab[tabxy[0]] != NULL)
             {
@@ -121,7 +269,7 @@ void mlx(t_env *a)
     a->win = mlx_new_window(a->mlx, WIDTH, HEIGHT, "fdf42");
     a->img = mlx_new_image(a->mlx, WIDTH, HEIGHT);
     a->imgstr = (int*)mlx_get_data_addr(a->img, &bpp, &sl, &endian);
-    draw(a);
+    drawcoord(a);
     mlx_key_hook(a->win, key_funct, a);
     mlx_loop(a->mlx);
 }
@@ -129,7 +277,6 @@ void mlx(t_env *a)
 int main(int ac, char **av)
 {
 	t_env main;
-
 	if (ac == 2)
 	{
         main.file = av[1];

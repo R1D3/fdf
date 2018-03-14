@@ -12,8 +12,8 @@
 
 #ifndef _FDF_H_
 # define _FDF_H_
-# define WIDTH		800
-# define HEIGHT		600
+# define WIDTH		2400
+# define HEIGHT		1800
 # include "libft/libft.h"
 # include "mlx.h"
 # include <math.h>

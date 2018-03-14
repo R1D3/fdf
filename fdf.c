@@ -21,24 +21,16 @@ int key_funct(int keycode, t_env *a)
     return (0);
 }
 
-void iso(t_env *a)
-{
-    a->x = a->x1 - a->y1;
-    a->y = (a->y1 + a->x1) / 2;
-}
-
 void segment(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
 {
-    a->x1 = coord[tabxy[0]][tabxy[1]][0];
-    a->x2 = coord[tabxy[0]][tabxy[1] + 1][0];
-    a->y1 = coord[tabxy[0]][tabxy[1]][1];
-    a->y2 = coord[tabxy[0] + 1][tabxy[1]][1];
     a->x = a->x1;
     a->y = a->y1;
-    a->dx = abs(a->x2 - a->x1);
-    a->dy = abs(a->y2 - a->y1);
+    a->dx = (a->x2 - a->x1);
+    a->dy = (a->y2 - a->y1);
     a->xinc = ( a->dx > 0 ) ? 1 : -1;
     a->yinc = ( a->dy > 0 ) ? 1 : -1;
+    a->dx = abs(a->dx);
+    a->dy = abs(a->dy);
     if (a->dx > a->dy)
     {
         a->cumul = a->dx / 2 ;
@@ -52,10 +44,12 @@ void segment(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
                 a->cumul -= a->dx;
                 a->y += a->yinc;
             }
-            a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
             if (a->map[tabxy[0]][tabxy[1]] != 0)
-                if( a->map[tabxy[0]][tabxy[1]] > 0)
-                    a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
+            {
+                a->imgstr[((a->x + a->y) / 2 ) * WIDTH + (a->x - a->y )] = 0x00FF0000;
+            }
+            else 
+                a->imgstr[((a->x + a->y) / 2 ) * WIDTH + (a->x - a->y )] = 0x00FFFFFF;
         }
     }
     else 
@@ -71,77 +65,14 @@ void segment(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
                 a->cumul -= a->dy ;
                 a->x += a->xinc ;
             }
-            a->imgstr[a->y * WIDTH + a->x] = 0x00FFFFFF;
-            if (a->map[tabxy[0]][tabxy[1]] != 0)
-                a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
-        }
-    }
-}
-
-void horizontal(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
-{
-    a->x1 = coord[tabxy[0]][tabxy[1]][0];
-    a->x2 = coord[tabxy[0]][tabxy[1] + 1][0];
-    a->y1 = coord[tabxy[0]][tabxy[1]][1];
-    a->y2 = coord[tabxy[0]][tabxy[1] + 1][1];
-   a->x = a->x1;
-    a->y = a->y1;
-    a->dx = abs(a->x2 - a->x1);
-    a->dy = abs(a->y2 - a->y1);
-    a->xinc = ( a->dx > 0 ) ? 1 : -1;
-    a->yinc = ( a->dy > 0 ) ? 1 : -1;
-    if (a->dx > a->dy)
-    {
-        a->cumul = a->dx / 2 ;
-        a->i = 1;
-        while (a->i++ <= a->dx && tabxy[1] < a->chars - 1)
-        {
-            a->x += a->xinc;
-            a->cumul += a->dy;
-            if (a->cumul >= a->dx)
-            {
-                a->cumul -= a->dx;
-                a->y += a->yinc;
-            }
-            a->imgstr[a->y * WIDTH + a->x] = 0x00FFFFFF;
             if (a->map[tabxy[0]][tabxy[1]] != 0)
             {
-                a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
+                a->imgstr[((a->x + a->y) / 2 ) * WIDTH + (a->x - a->y )] = 0x00FF0000;
             }
-        }
-    }
-}
-
-void vertical(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
-{
-    a->x1 = coord[tabxy[0]][tabxy[1]][0];
-    a->x2 = coord[tabxy[0]][tabxy[1]][0];
-    a->y1 = coord[tabxy[0]][tabxy[1]][1];
-    a->y2 = coord[tabxy[0] + 1][tabxy[1]][1];
-    a->x = a->x1;
-    a->y = a->y1;
-    a->dx = abs(a->x2 - a->x1);
-    a->dy = abs(a->y2 - a->y1);
-    a->xinc = ( a->dx > 0 ) ? 1 : -1;
-    a->yinc = ( a->dy > 0 ) ? 1 : -1;
-    if (a->map[tabxy[0]][tabxy[1]] != 0)
-                a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
-    if (!(a->dx > a->dy))
-    {
-        a->cumul = a->dy / 2 ;
-        a->i = 1;
-        while (a->i++ <= a->dy && tabxy[0] < a->lines - 1)
-        {
-            a->y += a->yinc ;
-            a->cumul += a->dx ;
-            if ( a->cumul >= a->dy ) 
+            else
             {
-                a->cumul -= a->dy ;
-                a->x += a->xinc ;
+                a->imgstr[((a->x + a->y) / 2 ) * WIDTH + (a->x - a->y )] = 0x00FFFFFF;
             }
-            a->imgstr[a->y * WIDTH + a->x] = 0x00FFFFFF;
-            if (a->map[tabxy[0]][tabxy[1]] != 0)
-                a->imgstr[a->y * WIDTH + a->x] = 0x00FF0000;
         }
     }
 }
@@ -154,14 +85,25 @@ void draw(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
             tabxy[1] = 0;
             while (a->x1 < WIDTH && tabxy[1] < a->chars)
                 {
-                    horizontal(a, coord, tabxy);
-                    vertical(a, coord, tabxy);
-                    segment(a, coord, tabxy);
+                    a->x1 = coord[tabxy[0]][tabxy[1]][0];
+                    a->y1 = coord[tabxy[0]][tabxy[1]][1];
+                    if (tabxy[1] != (a->chars - 1))
+                    {
+                        a->x2 = coord[tabxy[0]][tabxy[1] + 1][0];
+                        a->y2 = coord[tabxy[0]][tabxy[1] + 1][1];
+                        segment(a, coord, tabxy);
+                    }
+                    if (tabxy[0] != (a->lines - 1))
+                    {
+                        a->x2 = coord[tabxy[0] + 1][tabxy[1]][0];
+                        a->y2 = coord[tabxy[0] + 1][tabxy[1]][1];
+                        segment(a, coord, tabxy);
+                    }
                     tabxy[1]++;
                 }
             tabxy[0]++;
         }
-    mlx_put_image_to_window(a->mlx, a->win, a->img, 150, 150);
+    mlx_put_image_to_window(a->mlx, a->win, a->img, 250, 250);
 }
 
 void drawcoord(t_env *a)
@@ -170,16 +112,24 @@ void drawcoord(t_env *a)
     int coord[a->lines + 1][a->chars + 1][2];
 
     tabxy[0] = 0;
-    a->y1 = 0;
+    a->y1 = -250;
     while (a->y1 < HEIGHT && tabxy[0] < a->lines)
         {
 
-            a->x1 = 0; 
+            a->x1 = 250;
             tabxy[1] = 0;
             while (a->x1 < WIDTH && tabxy[1] < a->chars)
                 {
-                    coord[tabxy[0]][tabxy[1]][0] = a->x1;
-                    coord[tabxy[0]][tabxy[1]][1] = a->y1;
+                    if (a->map[tabxy[0]][tabxy[1]] == 0)
+                    {
+                        coord[tabxy[0]][tabxy[1]][0] = a->x1;
+                        coord[tabxy[0]][tabxy[1]][1] = a->y1;
+                    }
+                    else
+                    {
+                        coord[tabxy[0]][tabxy[1]][0] = a->x1 - (a->map[tabxy[0]][tabxy[1]] * 4);
+                        coord[tabxy[0]][tabxy[1]][1] = a->y1 - (a->map[tabxy[0]][tabxy[1]] * 4);
+                    }
                     a->x1 += 30;
                     tabxy[1]++;
                 }

@@ -31,6 +31,10 @@ void segment(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
     a->yinc = ( a->dy > 0 ) ? 1 : -1;
     a->dx = abs(a->dx);
     a->dy = abs(a->dy);
+    if (a->map[tabxy[0]][tabxy[1]] != 0)
+        a->imgstr[((a->x + a->y) / 2 ) * WIDTH + (a->x - a->y )] = 0x00FF0000;
+    else 
+        a->imgstr[((a->x + a->y) / 2 ) * WIDTH + (a->x - a->y )] = 0x00FFFFFF;
     if (a->dx > a->dy)
     {
         a->cumul = a->dx / 2 ;
@@ -45,9 +49,7 @@ void segment(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
                 a->y += a->yinc;
             }
             if (a->map[tabxy[0]][tabxy[1]] != 0)
-            {
                 a->imgstr[((a->x + a->y) / 2 ) * WIDTH + (a->x - a->y )] = 0x00FF0000;
-            }
             else 
                 a->imgstr[((a->x + a->y) / 2 ) * WIDTH + (a->x - a->y )] = 0x00FFFFFF;
         }
@@ -66,13 +68,9 @@ void segment(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
                 a->x += a->xinc ;
             }
             if (a->map[tabxy[0]][tabxy[1]] != 0)
-            {
                 a->imgstr[((a->x + a->y) / 2 ) * WIDTH + (a->x - a->y )] = 0x00FF0000;
-            }
-            else
-            {
+            else 
                 a->imgstr[((a->x + a->y) / 2 ) * WIDTH + (a->x - a->y )] = 0x00FFFFFF;
-            }
         }
     }
 }
@@ -103,7 +101,7 @@ void draw(t_env *a, int coord[][a->chars + 1][2], int tabxy[2])
                 }
             tabxy[0]++;
         }
-    mlx_put_image_to_window(a->mlx, a->win, a->img, 250, 250);
+    mlx_put_image_to_window(a->mlx, a->win, a->img, 0, 0);
 }
 
 void drawcoord(t_env *a)
@@ -112,11 +110,11 @@ void drawcoord(t_env *a)
     int coord[a->lines + 1][a->chars + 1][2];
 
     tabxy[0] = 0;
-    a->y1 = -250;
+    a->y1 = a->propy;
     while (a->y1 < HEIGHT && tabxy[0] < a->lines)
         {
 
-            a->x1 = 250;
+            a->x1 = a->propx;
             tabxy[1] = 0;
             while (a->x1 < WIDTH && tabxy[1] < a->chars)
                 {
@@ -127,13 +125,13 @@ void drawcoord(t_env *a)
                     }
                     else
                     {
-                        coord[tabxy[0]][tabxy[1]][0] = a->x1 - (a->map[tabxy[0]][tabxy[1]] * 4);
-                        coord[tabxy[0]][tabxy[1]][1] = a->y1 - (a->map[tabxy[0]][tabxy[1]] * 4);
+                        coord[tabxy[0]][tabxy[1]][0] = a->x1 - a->map[tabxy[0]][tabxy[1]] * 10;
+                        coord[tabxy[0]][tabxy[1]][1] = a->y1 - a->map[tabxy[0]][tabxy[1]] * 10;
                     }
-                    a->x1 += 30;
+                    a->x1 += a->prop;
                     tabxy[1]++;
                 }
-            a->y1 += 30;
+            a->y1 += a->prop;
             tabxy[0]++;
         }
     draw(a, coord, tabxy);
@@ -209,12 +207,34 @@ int ft_reader(t_env *a)
     return ((tabxy[2] == -1) ? -1 : 0);
 }
 
+void init(t_env *a)
+{
+    if (a->chars > 40 && a->chars < 99)
+    {   
+        a->prop = 15;
+        a->propy = -500;
+        a->propx = WIDTH / 4;
+    }
+    else if (a->chars > 99 && a->lines > 99)
+    {   
+        a->prop = 7;
+        a->propy = -200;
+        a->propx = WIDTH / 5; 
+    }
+    else
+    {
+        a->propy = -250;
+        a->prop = 30;
+        a->propx = WIDTH / 2;
+    }
+        
+}
 void mlx(t_env *a)
 {
     int bpp;
     int sl;
     int endian;
-
+    init(a);
     a->mlx = mlx_init();
     a->win = mlx_new_window(a->mlx, WIDTH, HEIGHT, "fdf42");
     a->img = mlx_new_image(a->mlx, WIDTH, HEIGHT);

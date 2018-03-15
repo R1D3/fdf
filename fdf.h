@@ -12,8 +12,8 @@
 
 #ifndef _FDF_H_
 # define _FDF_H_
-# define WIDTH		2400
-# define HEIGHT		1800
+# define WIDTH		3600
+# define HEIGHT		2400
 # include "libft/libft.h"
 # include "mlx.h"
 # include <math.h>
@@ -30,6 +30,9 @@ typedef struct		s_env
 	int				*imgstr;
 	char			*file;
 	int				fd;
+	int				prop;
+	int				propy;
+	int				propx;
 	int				lines;
 	int				chars;
 	int				i;

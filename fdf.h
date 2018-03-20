@@ -10,12 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+
 #ifndef _FDF_H_
 # define _FDF_H_
-# define WIDTH		3600
-# define HEIGHT		2400
+# define BLACK		0x000000
+# define BLUE 		0x0041FF
+# define BROWN 		0x613519
+# define GREEN1		0x234F0F
+# define GREEN		0x2A6B11
+# define GREY		0x808080
+# define RED 		0xFF0000
+# define YELLOW 	0xFFFF00
+# define WHITE 		0xFFFFFF
 # include "libft/libft.h"
-# include "mlx.h"
+# include "minilibx_macos/mlx.h"
 # include <math.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -35,9 +43,17 @@ typedef struct		s_env
 	int				propx;
 	int				lines;
 	int				chars;
+	int				win_width;
+	int				win_length;
+	int				xmax;
+	int				bpp;
+	int				sl;
+	int				endian;
+	int				proj;
+	int				ymax;
+	int				xmin;
+	int				ymin;			
 	int				i;
-	int				j;
-	int				k;
 	int				x;
 	int				y;
 	int				x1;

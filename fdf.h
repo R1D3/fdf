@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #ifndef _FDF_H_
 # define _FDF_H_
 # define BLACK		0x000000
@@ -38,6 +37,7 @@ typedef struct		s_env
 	int				*imgstr;
 	char			*file;
 	int				fd;
+	int				mul;
 	int				prop;
 	int				propy;
 	int				propx;
@@ -45,14 +45,10 @@ typedef struct		s_env
 	int				chars;
 	int				win_width;
 	int				win_length;
-	int				xmax;
 	int				bpp;
 	int				sl;
 	int				endian;
-	int				proj;
-	int				ymax;
-	int				xmin;
-	int				ymin;			
+	int				proj;		
 	int				i;
 	int				x;
 	int				y;

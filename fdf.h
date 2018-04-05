@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+
 #ifndef _FDF_H_
 # define _FDF_H_
 # define BLACK		0x000000
@@ -29,27 +30,12 @@
 # include <unistd.h>
 # include <fcntl.h>
 
-typedef struct		s_env
+typedef struct		s_point
 {
-	void			*mlx;
-	void			*win;
-	void			*img;
-	int				*imgstr;
-	char			*file;
-	int				fd;
-	int				mul;
-	int				prop;
-	int				propy;
-	int				propx;
-	int				lines;
-	int				chars;
-	int				win_width;
-	int				win_length;
-	int				bpp;
-	int				sl;
-	int				endian;
-	int				proj;		
-	int				i;
+	int				xmin;
+	int				ymin;
+	int				xmax;
+	int				ymax;		
 	int				x;
 	int				y;
 	int				x1;
@@ -61,9 +47,33 @@ typedef struct		s_env
 	int				xinc;
 	int				yinc;
 	int				cumul;
+}					t_point;
+
+typedef struct		s_env
+{
+	void			*mlx;
+	void			*win;
+	void			*img;
+	int				*imgstr;
+	char			*file;
+	int				fd;
+	int				mul;
+	int				i;
+	int				prop;
+	int				propy;
+	int				propx;
+	int				lines;
+	int				chars;
+	int				win_width;
+	int				win_length;
+	int				bpp;
+	int				sl;
+	int				endian;
+	int				proj;
 	int				check;
 	int				color;
 	int				**map;
+	struct s_point	point;
 }					t_env;
 
 #endif

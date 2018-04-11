@@ -10,20 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #ifndef _FDF_H_
 # define _FDF_H_
-# define BLACK		0x000000
-# define BLUE 		0x0041FF
-# define BROWN 		0x613519
-# define GREEN1		0x234F0F
-# define GREEN		0x2A6B11
-# define GREY		0x808080
-# define RED 		0xFF0000
-# define YELLOW 	0xFFFF00
 # define WHITE 		0xFFFFFF
-# include "libft/libft.h"
-# include "minilibx_macos/mlx.h"
+# include "../libft/libft.h"
+# include "mlx.h"
 # include <math.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -76,4 +67,18 @@ typedef struct		s_env
 	struct s_point	point;
 }					t_env;
 
+void	mlx(t_env *a);
+int		ft_reader(t_env *a);
+void	ft_space(t_env *fdf);
+void	ft_pos3(t_env *fdf);
+void	ft_pos2(t_env *fdf);
+void	ft_pos(t_env *fdf);
+void	ft_window(t_env *fdf);
+void	drawcoord(t_env *a);
+void	draw(t_env *a, int coord[][a->chars + 1][2], int tabxy[2]);
+void	segment(t_env *a);
+void	put_pixel(t_env *a);
+void	init(t_env *a);
+int		ft_expose_hook(t_env *a);
+int		key_funct(int keycode, t_env *a);
 #endif
